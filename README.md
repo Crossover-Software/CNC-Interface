@@ -1,6 +1,5 @@
 # CNCtoInterface
 
-## CNC TO INTERFACE APPLICATION
 Deze applicatie zal het mogelijk maken om via een pc of laptop data uit CNC machine's te lezen en aan te sturen
 
 ## SETUP
