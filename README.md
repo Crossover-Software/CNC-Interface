@@ -7,4 +7,4 @@ Deze applicatie zal het mogelijk maken om via een pc of laptop data uit CNC mach
 2. Controleer of de libpath in main.py klopt
 3. Controleer of de IP klopt/de CNC machine aan staat met een ping in CMD 
 
-De interface maakt gebruik van Python 3.9. Het programma is ontwikkelt op een Windows platform. 
+De interface maakt gebruik van Python 3.9. Het programma is ontwikkelt op een Windows platform. Je Python versie kan gecheckt worden door 'python' in de CMD te typen. 
