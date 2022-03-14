@@ -14,12 +14,15 @@ ret = focas.cnc_startupprocess(0, "focas.log")
 if ret != 0:
     raise Exception(f"Failed to create required log file! ({ret})")
 
-ip = "192.168.71.140"
-port = 8193
+
+ip = "192.168.71.140" #ip van de CNC machine
+port = 8193 # Port van de CNC machine
 timeout = 10
+# Specificeer seconden voor time-out. Als u 0 opgeeft, wordt het time-outproces genegeerd en wachten de libraryfunctions oneindig, 10 bij hoge internetsnelheid, 60 bij lage snelheden.
 libh = ctypes.c_ushort(0)
 
 print(f"connecting to machine at {ip}:{port}...")
+#returned response uit de cnc_allclibhndl3 functie uit de DLL
 ret = focas.cnc_allclibhndl3(
     ip.encode(),
     port,
