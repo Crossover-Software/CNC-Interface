@@ -50,10 +50,12 @@ try:
 
     #read macrovar
     cnc_macrovar = (ctypes.c_short * 4)()
+    #param 1 = libhandle, param2 = macrovarid, param3 = length, param4 = returnval
     ret = focas.cnc_rdmacro(libh, 3002, 10, cnc_macrovar)
     if ret != 0:
         raise Exception(f"Failed to read macro variable! ({ret})")
 
+    #loop cnc_macrovar and insert all vals into macrovar
     macrovar = "-".join([f"{cnc_macrovar[i]:08x}" for i in range(4)])
     print(f"macrovariable={macrovar}")
 
