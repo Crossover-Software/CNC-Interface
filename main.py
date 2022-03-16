@@ -1,5 +1,6 @@
 import ctypes
 import os
+from typing import NamedTuple
 
 libpath = (
     os.path.join(os.getcwd(), "Fwlib64.dll")
@@ -40,24 +41,33 @@ try:
     machine_id = "-".join([f"{cnc_ids[i]:08x}" for i in range(4)])
     print(f"machine_id={machine_id}")
 
-
     #write macrovar
-    ret = focas.cnc_wrmacro(libh, 3002, 10, 1, 1)
+    ret = focas.cnc_wrmacro(libh, 500, 10, 200, 2)
     if ret != 0:
         raise Exception(f"Failed to write cnc macrovar! ({ret})")
 
     print("macrovar written succesfully!")
 
     #read macrovar
-    cnc_macrovar = (ctypes.c_uint32 * 4)()
+    ODBM = (ctypes.c_short * 4)()
+
+    class ODBM(ctypes.Structure):
+        _fields_ = [("datano", ctypes.c_short),
+                    ("dummy", ctypes.c_short),
+                    ("mcr_val", ctypes.c_long),
+                    ("dec_val", ctypes.c_short)]
+    odbm = ODBM()
+    # TODO fix decimal
+    # cnc_macrovar = (ctypes.c_uint32 * 4)()
     #param 1 = libhandle, param2 = macrovarid, param3 = length, param4 = returnval
-    ret = focas.cnc_rdmacro(libh, 3002, 10, cnc_macrovar)
+    ret = focas.cnc_rdmacro(libh, 500, 10, ctypes.byref(odbm))
     if ret != 0:
         raise Exception(f"Failed to read macro variable! ({ret})")
 
     #loop cnc_macrovar and insert all vals into macrovar
-    macrovar = "-".join([f"{cnc_macrovar[i]:08x}" for i in range(4)])
-    print(f"macrovariable={macrovar}")
+    print("{:2f}".format(round(odbm.mcr_val, odbm.dec_val)))
+    print(odbm.dec_val)
+    print(odbm.mcr_val)
     #end read macrovar
 
     #read statinfo
