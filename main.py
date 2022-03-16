@@ -31,6 +31,7 @@ if ret != 0:
     raise Exception(f"Failed to connect to cnc! ({ret})")
 
 try:
+    #read machine id
     cnc_ids = (ctypes.c_uint32 * 4)()
     ret = focas.cnc_rdcncid(libh, cnc_ids)
     if ret != 0:
@@ -38,6 +39,23 @@ try:
 
     machine_id = "-".join([f"{cnc_ids[i]:08x}" for i in range(4)])
     print(f"machine_id={machine_id}")
+
+
+    #write macrovar
+    ret = focas.cnc_wrmacro(libh, 3002, 10, 24, 1)
+    if ret != 0:
+        raise Exception(f"Failed to write cnc macrovar! ({ret})")
+
+    print("macrovar written succesfully!")
+
+    #read macrovar
+    cnc_macrovar = (ctypes.c_short * 4)()
+    ret = focas.cnc_rdmacro(libh, 3002, 10, cnc_macrovar)
+    if ret != 0:
+        raise Exception(f"Failed to read macro variable! ({ret})")
+
+    macrovar = "-".join([f"{cnc_macrovar[i]:08x}" for i in range(4)])
+    print(f"macrovariable={macrovar}")
 
 finally:
     ret = focas.cnc_freelibhndl(libh)
