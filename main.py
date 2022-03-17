@@ -1,6 +1,5 @@
 import ctypes
 import os
-from typing import NamedTuple
 
 libpath = (
     os.path.join(os.getcwd(), "Fwlib64.dll")
@@ -42,7 +41,7 @@ try:
     print(f"machine_id={machine_id}")
 
     #write macrovar
-    ret = focas.cnc_wrmacro(libh, 500, 10, 200, 2)
+    ret = focas.cnc_wrmacro(libh, 500, 10, 2, 2)
     if ret != 0:
         raise Exception(f"Failed to write cnc macrovar! ({ret})")
 
@@ -102,7 +101,7 @@ try:
         print(f"status of automatic operation= {cnc_statinfo[2]:01x}: C-START")
     elif cnc_statinfo[2] == 3:
         print(f"status of automatic operation= {cnc_statinfo[2]:01x}: F-HOLD")
-    elif cnc_statinfo[3] == 4:
+    elif cnc_statinfo[2] == 4:
         print(f"status of automatic operation= {cnc_statinfo[2]:01x}: B-STOP")
 
     #checks for status of axis movement, dwell (short motion in docs)
