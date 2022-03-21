@@ -41,7 +41,11 @@ try:
     print(f"machine_id={machine_id}")
 
     #write macrovar
-    ret = focas.cnc_wrmacro(libh, 500, 10, 2, 2)
+    macrovarid = 500 #Specify the custom macro variable number.
+    length = 10 #standaard 10
+    macrovarval = 200 #Specify the value of variable/numerical part of variable.
+    macrovardec = 0 #Specify the number of places of decimals/exponent part of variable.
+    ret = focas.cnc_wrmacro(libh, macrovarid, length, macrovarval, macrovardec)
     if ret != 0:
         raise Exception(f"Failed to write cnc macrovar! ({ret})")
 
@@ -64,9 +68,10 @@ try:
         raise Exception(f"Failed to read macro variable! ({ret})")
 
     #loop cnc_macrovar and insert all vals into macrovar
-    print("{:2f}".format(round(odbm.mcr_val, odbm.dec_val)))
+
     print(odbm.dec_val)
-    print(odbm.mcr_val)
+    divider = 10**(odbm.dec_val)
+    print(odbm.mcr_val/divider)
     #end read macrovar
 
     #read statinfo
