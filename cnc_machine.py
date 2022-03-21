@@ -5,11 +5,9 @@ import os
 class CncMachine:
     def __init__(self, ip="192.168.71.140", port=8193, timeout=10, libh=ctypes.c_ushort(0)):
         libpath = (
-            os.path.join(os.getcwd(), "Fwlib64.dll")
+            os.path.join(os.getcwd(), "Fwlib64.dll") #requires all dll files in directory to work
         )
-        self.focas = ctypes.cdll.LoadLibrary(libpath)
-        # focas.cnc_startupprocess.restype = ctypes.c_short
-        # focas.cnc_exitprocess.restype = ctypes.c_short
+        self.focas = ctypes.cdll.LoadLibrary(libpath) #load dll file
         self.focas.cnc_allclibhndl3.restype = ctypes.c_short
         self.focas.cnc_freelibhndl.restype = ctypes.c_short
         self.focas.cnc_rdcncid.restype = ctypes.c_short
@@ -44,12 +42,14 @@ class CncMachine:
 
     def establish_connection(self, ip, port, timeout, libh, focas):
         print(f"connecting to machine at {ip}:{port}...")
+        #ret is return val of status after communication
         ret = focas.cnc_allclibhndl3(
             ip.encode(),
             port,
             timeout,
             ctypes.byref(libh),
         )
+        #return status 0 means succesfull comms, anything else is failure
         if ret != 0:
             raise Exception(f"Failed to connect to cnc! ({ret})")
 
@@ -59,16 +59,15 @@ class CncMachine:
         ret = focas.cnc_rdcncid(libh, cnc_ids)
         if ret != 0:
             raise Exception(f"Failed to read cnc id! ({ret})")
-
         machine_id = "-".join([f"{cnc_ids[i]:08x}" for i in range(4)])
         print(f"machine_id={machine_id}")
 
     def write_macro(self, focas, libh, macroid, macroval):
         # write macrovar
         macrovarid = macroid  # Specify the custom macro variable number.
-        length = 10  # standaard 10
+        length = 10  # standard val = 10
         macrovarval = macroval  # Specify the value of variable/numerical part of variable.
-        macrovardec = 0  # Specify the number of places of decimals/exponent part of variable.
+        macrovardec = 0  # Specify the number of places of decimals/exponent part of variable. Keep this on 0
         ret = focas.cnc_wrmacro(libh, macrovarid, length, macrovarval, macrovardec)
         if ret != 0:
             raise Exception(f"Failed to write cnc macrovar! ({ret})")
@@ -88,8 +87,8 @@ class CncMachine:
         if ret != 0:
             raise Exception(f"Failed to read macro variable! ({ret})")
 
-        divider = 10 ** (odbm.dec_val)
-        print(odbm.mcr_val / divider)
+        divider = 10 ** odbm.dec_val #dec_val is amount of extra 0's added to mcr_val
+        print(odbm.mcr_val / divider) #removes extra 0's so decimal is on correct position
         # end read macrovar
 
     def read_statinfo(self, focas, libh):
@@ -101,7 +100,6 @@ class CncMachine:
             raise Exception(f"Failed to read macro variable! ({ret})")
 
         print(f"dummy={cnc_statinfo[0]:01x}")
-
         # checks for AUTOMATIC/MANUAL mode selection (short aut in docs)
         if cnc_statinfo[1] == 0:
             print(f"AUTOMATIC/MANUAL mode selection= {cnc_statinfo[1]:01x}: MDI")
