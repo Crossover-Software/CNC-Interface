@@ -1,10 +1,13 @@
 # CNCtoInterface
 
-Deze applicatie zal het mogelijk maken om via een pc of laptop data uit CNC machine's te lezen en aan te sturen
+This application will make it possible to read and write CNC Machine data from your computers.
 
 ## SETUP
-1. Clone de repo
-2. Controleer of de libpath in main.py klopt
-3. Controleer of de IP klopt/de CNC machine aan staat met een ping in CMD 
+1. Clone the repo
+2. Connect to CNC Machine
+3. Provide correct connection info in the code (IP address and port)
+5. Check if the libpath is working
+6. (Optional) Check connection with CNC Machine with a ping in CMD
 
-De interface maakt gebruik van Python 3.9. Het programma is ontwikkelt op een Windows platform. Je Python versie kan gecheckt worden door 'python' in de CMD te typen. 
+# ADDITIONAL INFORMATION
+The interface uses python 3.9. The application was developed on a Windows platform. You can check your python version by writing 'python' in your CMD and also checking in  your project settings in the IDE you use. The application was developed using the Fanuc Focas Library. 
