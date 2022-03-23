@@ -1,32 +1,26 @@
 import ctypes
 import os
 
-
+libpath = (
+    os.path.join(os.getcwd(), "Fwlib64.dll") #requires all dll files in directory to work
+)
+focas = ctypes.cdll.LoadLibrary(libpath) #load dll file
+focas.cnc_allclibhndl3.restype = ctypes.c_short
+focas.cnc_freelibhndl.restype = ctypes.c_short
+focas.cnc_rdcncid.restype = ctypes.c_short
+libh=ctypes.c_ushort(0)
 class CncMachine:
-    def __init__(self, ip="192.168.71.140", port=8193, timeout=10, libh=ctypes.c_ushort(0)):
-        libpath = (
-            os.path.join(os.getcwd(), "Fwlib64.dll") #requires all dll files in directory to work
-        )
-        self.focas = ctypes.cdll.LoadLibrary(libpath) #load dll file
-        self.focas.cnc_allclibhndl3.restype = ctypes.c_short
-        self.focas.cnc_freelibhndl.restype = ctypes.c_short
-        self.focas.cnc_rdcncid.restype = ctypes.c_short
+    def __init__(self, ip="192.168.71.140", port=8193, timeout=10):
         self.ip = ip
         self.port = port
         self.timeout = timeout
-        self.libh = libh
-
-    def get_focas(self):
-        return self.focas
+        self.establish_connection(ip, port, timeout)
 
     def get_port(self):
         return self.port
 
     def get_timeout(self):
         return self.timeout
-
-    def get_libh(self):
-        return self.libh
 
     def get_ip(self):
         return self.ip
@@ -40,7 +34,7 @@ class CncMachine:
     def set_port(self, newport):
         self.port = newport
 
-    def establish_connection(self, ip, port, timeout, libh, focas):
+    def establish_connection(self, ip, port, timeout):
         print(f"connecting to machine at {ip}:{port}...")
         #ret is return val of status after communication
         ret = focas.cnc_allclibhndl3(
@@ -53,7 +47,7 @@ class CncMachine:
         if ret != 0:
             raise Exception(f"Failed to connect to cnc! ({ret})")
 
-    def read_machineid(self, focas, libh):
+    def read_machineid(self):
         # read machine id
         cnc_ids = (ctypes.c_uint32 * 4)()
         ret = focas.cnc_rdcncid(libh, cnc_ids)
@@ -62,7 +56,7 @@ class CncMachine:
         machine_id = "-".join([f"{cnc_ids[i]:08x}" for i in range(4)])
         print(f"machine_id={machine_id}")
 
-    def write_macro(self, focas, libh, macroid, macroval):
+    def write_macro(self, macroid, macroval):
         # write macrovar
         macrovarid = macroid  # Specify the custom macro variable number.
         length = 10  # standard val = 10
@@ -73,7 +67,7 @@ class CncMachine:
             raise Exception(f"Failed to write cnc macrovar! ({ret})")
         print("macrovar written succesfully!")
 
-    def read_macro(self, focas, libh, macroid):
+    def read_macro(self, macroid):
         # read macrovar
         class ODBM(ctypes.Structure):
             _fields_ = [("datano", ctypes.c_short),
@@ -91,7 +85,7 @@ class CncMachine:
         print(odbm.mcr_val / divider) #removes extra 0's so decimal is on correct position
         # end read macrovar
 
-    def read_statinfo(self, focas, libh):
+    def read_statinfo(self):
         # read statinfo
         print("********START STAT-INFO********")
         cnc_statinfo = (ctypes.c_uint32 * 8)()
@@ -164,7 +158,7 @@ class CncMachine:
             print(f"status of edit= {cnc_statinfo[7]:01x}: RETRACE(during retrace)")
         print("********END STAT-INFO********")
 
-    def freelibhandle(self, focas, libh):
+    def freelibhandle(self):
         ret = focas.cnc_freelibhndl(libh)
         if ret != 0:
             raise Exception(f"Failed to free library handle! ({ret})")
